@@ -21,8 +21,8 @@ import { useNavigate } from "react-router-dom"
 import { useCreatePost, useUpdatePost } from "@/lib/react-query/queriesAndMutations"
 
 type PostFormProps = {
-    post?: Models.Document;
     action: 'Create' | 'Update';
+    post?: Models.Document;
 }
 
 const PostForm = ({ action, post }: PostFormProps) => {

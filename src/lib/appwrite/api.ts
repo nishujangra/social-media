@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ID } from "appwrite";
 import { INewPost, INewUser, IUpdatePost } from "@/types";
 import { account, appwriteConfig, avatars, databases, storage } from "./config";
@@ -143,16 +144,16 @@ export async function signOutAccount() {
 export async function createPost(post: INewPost) {
     try {
 
-        const uploadedFile = await uploadFile(post.file[0]);
+        const uploadedFile: any = await uploadFile(post.file[0]);
 
         if (!uploadedFile) {
             throw new Error("File upload failed");
         }
 
-        const fileUrl = getFilePreview(uploadedFile.$id);
+        const fileUrl = getFilePreview(uploadedFile?.$id);
 
         if (!fileUrl) {
-            await deleteFile(uploadedFile.$id);
+            await deleteFile(uploadedFile?.$id);
             throw new Error("File preview failed");
         }
 
@@ -167,14 +168,14 @@ export async function createPost(post: INewPost) {
                 creator: post.userId,
                 caption: post.caption,
                 imageUrl: fileUrl,
-                imageId: uploadedFile.$id,
+                imageId: uploadedFile?.$id,
                 location: post.location,
                 tags: tags,
             }
         );
 
         if (!newPost) {
-            await deleteFile(uploadedFile.$id);
+            await deleteFile(uploadedFile?.$id);
             throw new Error("Post creation failed");
         }
 
@@ -212,8 +213,6 @@ export function getFilePreview(fileId: string) {
             fileId,
             2000,
             2000,
-            "top",
-            100
         );
 
         if (!fileUrl) throw Error;
@@ -362,20 +361,20 @@ export async function updatePost(post: IUpdatePost) {
         }
 
         if (hasFileToUpdate) {
-            const uploadedFile = await uploadFile(post.file[0]);
+            const uploadedFile: any = await uploadFile(post.file[0]);
 
             if (!uploadFile) {
                 throw new Error("File upload failed");
             }
 
-            const fileUrl = getFilePreview(uploadedFile.$id);
+            const fileUrl = getFilePreview(uploadedFile?.$id);
 
             if (!fileUrl) {
-                await deleteFile(uploadedFile.$id);
+                await deleteFile(uploadedFile?.$id);
                 throw new Error("File preview failed");
             }
 
-            image = { ...image, imageUrl: fileUrl, imageId: uploadedFile.$id };
+            image = { ...image, imageUrl: fileUrl, imageId: uploadedFile?.$id };
         }
 
         const tags = post?.tags?.replace(/ /g, '').split(',') || [];
@@ -435,7 +434,7 @@ export async function deletePost(postId: string, imageId: string) {
 
 
 export async function getInfinitePosts({ pageParam }: { pageParam: number }) {
-    const queries: any[] = [Query.orderDesc('$updatedAt'), Query.limit(10)];
+    const queries = [Query.orderDesc('$updatedAt'), Query.limit(10)];
 
     if (pageParam) {
         queries.push(Query.cursorAfter(pageParam.toString()));
